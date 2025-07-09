@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Part Data Generator</title>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3f37c9;
+      --secondary-color: #4cc9f0;
+      --background: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #2b2d42;
+      --border-color: #e0e0e0;
+      --success-color: #4caf50;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background);
+      margin: 0;
+      padding: 20px;
+      color: var(--text-color);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text-color);
+    }
+    
+    input, textarea {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+    
+    .characteristics {
+      margin-top: 25px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    
+    .char-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.2s;
+    }
+    
+    .char-row:last-child {
+      border-bottom: none;
+    }
+    
+    .char-row:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    
+    .char-header {
+      font-weight: 600;
+      background: #f0f2ff;
+      position: sticky;
+      top: 0;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn i {
+      margin-right: 6px;
+    }
+    
+    .button-group {
+      margin: 25px 0;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .insert-btns {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: #f8f9ff;
+      border-radius: 8px;
+    }
+    
+    .insert-btns label {
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    .insert-btns button {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .insert-btns button:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+    
+    pre {
+      white-space: pre-wrap;
+      background: #1e1e2f;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: auto;
+      position: relative;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+      font-weight: normal;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    @media (max-width: 1200px) {
+      .char-row {
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: minmax(60px, auto);
+      }
+      
+      .char-row div:nth-child(5),
+      .char-row div:nth-child(6),
+      .char-row div:nth-child(7) {
+        grid-column: span 1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .char-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Part Data Generator</h1>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="partId">Part ID</label>
+        <input type="text" id="partId" placeholder="e.g., G0002" />
+      </div>
+      <div class="form-group">
+        <label for="partName">Part Name</label>
+        <input type="text" id="partName" placeholder="e.g., Gear Shaft X100" />
+      </div>
+      <div class="form-group">
+        <label for="partNote">Note</label>
+        <input type="text" id="partNote" placeholder="Optional note" />
+      </div>
+      <div class="form-group">
+        <label for="machines">Machine Compatibility</label>
+        <input type="text" id="machines" placeholder="e.g., PMT-A, PMT-B" />
+      </div>
+    </div>
+
+    <div class="insert-btns">
+      <label>Insert Symbols:</label>
+      <button type="button" class="symbol-btn" data-symbol="Ø">Diameter (Ø)</button>
+      <button type="button" class="symbol-btn" data-symbol="✓">Check (✓)</button>
+      <button type="button" class="symbol-btn" data-symbol="±">Plus/Minus (±)</button>
+      <button type="button" class="symbol-btn" data-symbol="°">Degree (°)</button>
+    </div>
+
+    <div class="characteristics">
+      <div class="char-row char-header">
+        <div>Characteristic</div>
+        <div>Specification</div>
+        <div>GC No</div>
+        <div>Alternate GC No</div>
+        <div class="tooltip">Tolerance
+          <span class="tooltiptext">Format: ±0.01 or +0.02/-0.01 or upper, lower, step</span>
+        </div>
+        <div class="tooltip">Tolerance2
+          <span class="tooltiptext">Format: ±0.01 or +0.02/-0.01 or upper, lower, step</span>
+        </div>
+        <div>Flags</div>
+      </div>
+      <div id="charContainer"></div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn" onclick="generateCode()">
+        <i>📋</i> Generate JSON
+      </button>
+      <button class="btn" onclick="copyToClipboard()">
+        <i>⎘</i> Copy to Clipboard
+      </button>
+    </div>
+
+    <pre id="output">
+      <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+      Generated code will appear here...
+    </pre>
+  </div>
+
+  <script>
+    // Track the last focused input element
+    let lastFocusedInput = null;
+
+    // Add focus event listeners to all input fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          lastFocusedInput = this;
+        });
+      });
+
+      // Add click event listeners to symbol buttons
+      document.querySelectorAll('.symbol-btn').forEach(button => {
+        button.addEventListener('mousedown', function(e) {
+          e.preventDefault(); // Prevent focus loss
+        });
+        
+        button.addEventListener('click', function() {
+          if (lastFocusedInput) {
+            insertSymbol(this.dataset.symbol, lastFocusedInput);
+          } else {
+            alert("Please click on an input field first to insert the symbol.");
+          }
+        });
+      });
+    });
+
+    const charNames = [
+      'Cone Diameter', 
+      'Ra', 
+      'Rpk',
+      'Mr1',
+      'No Visual Defect'
+    ];
+
+    const measurements = [
+      'Job Master', 
+      'Surface Tester',
+      'Surface Tester',
+      'Surface Tester',
+      'Visual'
+    ];
+
+    const container = document.getElementById("charContainer");
+
+    charNames.forEach((name, i) => {
+      const row = document.createElement("div");
+      row.className = "char-row";
+      row.innerHTML = `
+        <div>${name || ''}</div>
+        <div><input type="text" class="spec" placeholder="${measurements[i]}" /></div>
+        <div><input type="text" class="gcNo" /></div>
+        <div><input type="text" class="altGc" /></div>
+        <div><input type="text" class="tol" placeholder="±0.01 or +0.02/-0.01 or upper, lower, step" /></div>
+        <div><input type="text" class="tol2" placeholder="±0.01 or +0.02/-0.01 or upper, lower, step" /></div>
+        <div class="checkbox-group">
+          <label><input type="checkbox" class="showCb" /> SCB</label>
+          <label><input type="checkbox" class="rr" /> RR</label>
+        </div>
+      `;
+      container.appendChild(row);
+    });
+
+    function parseTol(val) {
+      if (!val) return {};
+      
+      // Handle upper, lower, step format
+      if (val.includes(',')) {
+        const parts = val.split(',').map(p => p.trim());
+        if (parts.length === 3 && !isNaN(parts[0])) {
+          return {
+            upper: parseFloat(parts[0]),
+            lower: parseFloat(parts[1]),
+            step: parseFloat(parts[2])
+          };
+        }
+      }
+      
+      // Handle ± format
+      if (val.includes("±")) {
+        const v = parseFloat(val.replace("±", ""));
+        return { upper: v, lower: -v, step: 0.001 };
+      }
+      
+      // Handle +x/-y format
+      if (val.match(/^[-+±]?[0-9.]+\s*[-/]{1}\s*[-+]?[0-9.]+$/)) {
+        const parts = val.split(/[-/]/).map(p => p.trim());
+        return {
+          upper: parseFloat(parts[0]),
+          lower: parseFloat(parts[1]),
+          step: 0.001
+        };
+      }
+      
+      // Handle single number
+      if (!isNaN(parseFloat(val))) {
+        return { upper: parseFloat(val), lower: parseFloat(val), step: 0.001 };
+      }
+      
+      // Fallback to text
+      return { text: val };
+    }
+
+    function generateCode() {
+      const id = document.getElementById("partId").value.trim();
+      const name = document.getElementById("partName").value.trim();
+      const note = document.getElementById("partNote").value.trim();
+      const machines = document.getElementById("machines").value
+        .split(",").map(x => x.trim()).filter(Boolean);
+
+      const rows = document.querySelectorAll(".char-row:not(.char-header)");
+      const characteristics = [];
+
+      rows.forEach((row, i) => {
+        const spec = row.querySelector(".spec").value.trim();
+        const gcNo = row.querySelector(".gcNo").value.trim();
+        const altGc = row.querySelector(".altGc").value.trim();
+        const tol = parseTol(row.querySelector(".tol").value.trim());
+        const tol2 = parseTol(row.querySelector(".tol2").value.trim());
+        const showCheckbox = row.querySelector(".showCb").checked;
+        const rangeRule = row.querySelector(".rr").checked;
+
+        const obj = {
+          name: charNames[i] || '',
+          specification: spec,
+          measurement: measurements[i],
+          gcNo,
+          alternateGcNo: altGc
+        };
+        
+        if (Object.keys(tol).length) obj.tolerance = tol;
+        if (Object.keys(tol2).length) obj.tolerance2 = tol2;
+        if (showCheckbox) obj.showCheckbox = true;
+        if (rangeRule) obj.rangeRule = true;
+
+        characteristics.push(obj);
+      });
+
+      // Single-line output format
+      const jsCode = `{id:'${id}',name:'${name}',note:'${note}',machineCompatibility:${JSON.stringify(machines)},characteristics:${JSON.stringify(characteristics)}},`;
+      
+      document.getElementById("output").textContent = jsCode;
+    }
+
+    function copyToClipboard() {
+      const output = document.getElementById("output");
+      const text = output.textContent || output.innerText;
+      
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';  // Prevent scrolling to bottom
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        // Execute the copy command
+        const successful = document.execCommand('copy');
+        const copyBtn = document.querySelector('.copy-btn');
+        if (successful) {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+      
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+    }
+
+    function insertSymbol(symbol, inputElement) {
+      if (!inputElement) {
+        inputElement = lastFocusedInput;
+      }
+      
+      if (inputElement && (inputElement.tagName === "INPUT" || inputElement.tagName === "TEXTAREA")) {
+        const start = inputElement.selectionStart;
+        const end = inputElement.selectionEnd;
+        const text = inputElement.value;
+        inputElement.value = text.slice(0, start) + symbol + text.slice(end);
+        inputElement.selectionStart = inputElement.selectionEnd = start + symbol.length;
+        inputElement.focus();
+      } else {
+        alert("Please click on an input field first to insert the symbol.");
+      }
+    }
+
+    document.getElementById('pasteBtn').addEventListener('click', async function() {
+      try {
+        // Request clipboard read permission
+        const clipboardItems = await navigator.clipboard.read();
+        
+        for (const clipboardItem of clipboardItems) {
+          for (const type of clipboardItem.types) {
+            if (type === 'text/plain') {
+              const blob = await clipboardItem.getType(type);
+              const text = await blob.text();
+              
+              // Process the pasted data
+              const rows = text.split('\n').filter(row => row.trim());
+              const charRows = document.querySelectorAll('.char-row:not(.char-header)');
+              
+              rows.forEach((row, i) => {
+                if (i >= charRows.length) return;
+                
+                // Split by tabs or multiple spaces
+                const cells = row.split(/\t| {2,}/).map(cell => cell.trim());
+                const currentRow = charRows[i];
+                
+                // Update fields only if they exist in the pasted data
+                if (cells[0] !== undefined) currentRow.querySelector('div:first-child').textContent = cells[0] || '';
+                if (cells[1] !== undefined) currentRow.querySelector('.spec').value = cells[1] || '';
+                if (cells[2] !== undefined) currentRow.querySelector('.gcNo').value = cells[2] || '';
+                if (cells[3] !== undefined) currentRow.querySelector('.altGc').value = cells[3] || '';
+                if (cells[4] !== undefined) currentRow.querySelector('.tol').value = cells[4] || '';
+                if (cells[5] !== undefined) currentRow.querySelector('.tol2').value = cells[5] || '';
+                
+                // Handle checkboxes (SCB and RR)
+                if (cells[6] !== undefined) {
+                  const scbChecked = cells[6].toLowerCase().includes('scb') || cells[6].toLowerCase().includes('true');
+                  const rrChecked = cells[6].toLowerCase().includes('rr') || cells[6].toLowerCase().includes('true');
+                  currentRow.querySelector('.showCb').checked = scbChecked;
+                  currentRow.querySelector('.rr').checked = rrChecked;
+                }
+              });
+            }
+          }
+        }
+      } catch (err) {
+        // Fallback to prompt if clipboard API fails
+        console.error('Failed to read clipboard:', err);
+        const pasteText = prompt("Paste your characteristics data (tab-separated values):");
+        if (!pasteText) return;
+        
+        const rows = pasteText.split('\n').filter(row => row.trim());
+        const charRows = document.querySelectorAll('.char-row:not(.char-header)');
+        
+        rows.forEach((row, i) => {
+          if (i >= charRows.length) return;
+          
+          const cells = row.split(/\t| {2,}/).map(cell => cell.trim());
+          const currentRow = charRows[i];
+          
+          if (cells[0] !== undefined) currentRow.querySelector('div:first-child').textContent = cells[0] || '';
+          if (cells[1] !== undefined) currentRow.querySelector('.spec').value = cells[1] || '';
+          if (cells[2] !== undefined) currentRow.querySelector('.gcNo').value = cells[2] || '';
+          if (cells[3] !== undefined) currentRow.querySelector('.altGc').value = cells[3] || '';
+          if (cells[4] !== undefined) currentRow.querySelector('.tol').value = cells[4] || '';
+          if (cells[5] !== undefined) currentRow.querySelector('.tol2').value = cells[5] || '';
+          
+          if (cells[6] !== undefined) {
+            const scbChecked = cells[6].toLowerCase().includes('scb') || cells[6].toLowerCase().includes('true');
+            const rrChecked = cells[6].toLowerCase().includes('rr') || cells[6].toLowerCase().includes('true');
+            currentRow.querySelector('.showCb').checked = scbChecked;
+            currentRow.querySelector('.rr').checked = rrChecked;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
