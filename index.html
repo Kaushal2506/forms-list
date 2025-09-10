@@ -1,242 +1,892 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Content Portal</title>
-    <style>
-        :root {
-            --primary-color: #4a6bff;
-            --secondary-color: #6c5ce7;
-            --accent-color: #00cec9;
-            --dark-color: #2d3436;
-            --light-color: #f5f6fa;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoHub - PWA</title>
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7C3AED">
+<!-- Apple touch icon -->
+<link rel="apple-touch-icon" href="https://placehold.co/192x192/7C3AED/FFFFFF/png?text=V">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+  /* =============== THEME =============== */
+  :root {
+    /* Light */
+    --bg: #f8fafc;
+    --text: #0f172a;
+    --card-bg: #ffffff;
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    /* Gradients - Updated to violet gradient */
+    --grad-primary: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    --grad-primary-hover: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    --grad-header-accent: linear-gradient(90deg, rgba(139,92,246,.2), rgba(124,58,237,.2));
 
-        body {
-            background: linear-gradient(135deg, 
-                rgba(74, 107, 255, 0.15) 0%, 
-                rgba(108, 92, 231, 0.15) 20%, 
-                rgba(0, 206, 201, 0.15) 40%, 
-                rgba(253, 121, 168, 0.15) 60%, 
-                rgba(253, 203, 110, 0.15) 80%, 
-                rgba(74, 107, 255, 0.15) 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    /* UI */
+    --primary: #7C3AED;
+    --primary-hover: #6D28D9;
+    --modal-bg: rgba(0,0,0,0.85);
+    --radius: 12px;
+    --ring: 0 0 0 3px rgba(139,92,246,.25);
+  }
+  body.dark {
+    /* Dark */
+    --bg: #0b1221;
+    --text: #e5e7eb;
+    --card-bg: #121a2b;
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    /* Gradients (slightly deeper violet) */
+    --grad-primary: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+    --grad-primary-hover: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    --grad-header-accent: linear-gradient(90deg, rgba(167,139,250,.18), rgba(139,92,246,.18));
 
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    --modal-bg: rgba(0,0,0,0.92);
+  }
 
-        h1 {
-            background: linear-gradient(135deg, #4a6bff, #6c5ce7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            font-weight: 700;
-            font-size: 2.5rem;
-        }
+  /* =============== BASE =============== */
+  * { box-sizing: border-box; }
+  html, body { width:100%; }
+  body {
+    margin:0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .3s ease, color .3s ease;
+    overflow-x: hidden; /* prevent mobile overflow */
+  }
 
-        .subtitle {
-            color: #636e72;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
+  /* =============== HEADER =============== */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--card-bg);
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  header::after {
+    content:""; display:block; position:absolute; left:0; right:0; bottom:0; height:4px;
+    background: var(--grad-header-accent);
+  }
+  #searchBar {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(148,163,184,.35);
+    border-radius: var(--radius);
+    font-size: 15px;
+    background: #ffffff10;
+    color: var(--text);
+    outline: none;
+  }
+  #searchBar:focus { box-shadow: var(--ring); border-color: transparent; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
+  .icon-btn {
+    border: none; cursor: pointer; padding: 8px 10px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: var(--radius);
+    background-image: var(--grad-primary);
+    color: #fff;
+    transition: transform .2s ease, filter .2s ease, background-image .2s ease;
+  }
+  .icon-btn:hover { background-image: var(--grad-primary-hover); transform: translateY(-1px); }
+  .icon-btn:active { transform: translateY(0); }
+  .icon-btn svg { width: 20px; height: 20px; stroke: #fff; }
 
-        .btn {
-            position: relative;
-            padding: 25px 30px;
-            border: none;
-            border-radius: 15px;
-            background: white;
-            color: var(--dark-color);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            overflow: hidden;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 180px;
-        }
+  /* Theme toggle – keep inside bounds on mobile */
+  .theme-toggle {
+    width: 44px; height: 24px; flex-shrink:0;
+    background: #64748b;
+    border-radius: 999px;
+    position: relative; cursor: pointer;
+    transition: background .3s ease;
+  }
+  .theme-toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; border-radius: 999px; background: #fff;
+    transition: transform .3s ease;
+  }
+  body.dark .theme-toggle { background: #8B5CF6; }
+  body.dark .theme-toggle::after { transform: translateX(20px); }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            opacity: 0;
-            transition: var(--transition);
-            z-index: -1;
-        }
+  /* =============== FILTER BAR =============== */
+  .filter-buttons {
+    display:flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px;
+    justify-content: center;
+  }
+  .filter-buttons button {
+    display:flex; align-items:center; gap: 6px;
+    padding: 8px 12px; border: none; cursor: pointer;
+    border-radius: 999px;
+    background-image: var(--grad-primary);
+    color: #fff; font-size: 14px;
+    transition: background-image .2s ease, transform .15s ease;
+    white-space: nowrap;
+  }
+  .filter-buttons button:hover { background-image: var(--grad-primary-hover); transform: translateY(-1px); }
+  .filter-buttons button:active { transform: translateY(0); }
+  .filter-buttons button svg { width: 16px; height: 16px; stroke: #fff; }
 
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            color: white;
-        }
+  /* =============== GRID / CARDS =============== */
+  .video-grid {
+    display:grid; gap: 10px; padding: 10px 12px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .video-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      max-width: 100%; /* Use full width on desktop */
+      margin: 0 auto;
+    }
+  }
+  @media (min-width: 1024px) {
+    .video-grid {
+      grid-template-columns: repeat(4, 1fr); /* Maximum 4 columns on big screens */
+    }
+  }
+  .video-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .video-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,.12); }
 
-        .btn:hover::before {
-            opacity: 1;
-        }
+  /* ---- Fixed Image spacing (no cropping) ---- */
+  .video-card .thumbnail-container {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 5px;
+    width: calc(100% - 10px); /* Account for margin */
+  }
+  .video-card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Changed from cover to contain to prevent cropping */
+    background-color: #f1f5f9; /* Light background for non-filled areas */
+  }
+  body.dark .video-card img {
+    background-color: #1e293b; /* Dark background for non-filled areas */
+  }
 
-        .btn i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            transition: var(--transition);
-        }
+  /* ---- Fixed title spacing (show 2 complete lines) ---- */
+  .video-card b {
+    display: block;
+    padding: 8px 10px;
+    font-size: 15px;
+    text-align: left;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    height: 2.8em; /* Fixed height for 2 lines */
+    margin: 0;
+  }
 
-        .btn:hover i {
-            transform: scale(1.1);
-            color: white;
-        }
+  /* =============== PAGINATION =============== */
+  .pagination {
+    display:flex; justify-content:center; gap: 6px; padding: 12px;
+    flex-wrap: wrap;
+  }
+  .pagination button {
+    min-width: 36px; padding: 6px 10px;
+    border: 1px solid rgba(148,163,184,.35);
+    background: var(--card-bg);
+    border-radius: 10px;
+    cursor: pointer; color: var(--text); font-size: 14px;
+    transition: transform .15s ease, background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .pagination button.active {
+    background-image: var(--grad-primary);
+    color: #fff; border-color: transparent;
+  }
+  .pagination button:hover { transform: translateY(-1px); }
+  .pagination .ellipsis {
+    border: none; background: transparent; cursor: default; color: #94a3b8;
+  }
 
-        .btn-1::before {
-            background: linear-gradient(135deg, #4a6bff, #6c5ce7);
-        }
+  /* =============== MODALS =============== */
+  .modal {
+    display:none; position:fixed; inset:0; z-index: 1000;
+    background: var(--modal-bg);
+    justify-content:center; align-items:flex-start; overflow-y:auto; padding: 16px;
+  }
+  .modal-content {
+    background: var(--card-bg);
+    width: 96%; max-width: 900px;
+    margin: 36px auto; border-radius: 16px; overflow: hidden;
+    color: var(--text); position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,.35);
+  }
+  .close {
+    position: fixed; top: 10px; right: 16px;
+    font-size: 34px; color: #fff; cursor: pointer; z-index: 1100;
+  }
+  .player { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+  .video-title { font-size: 18px; font-weight: 700; padding: 10px 14px 0; }
+  .details { padding: 12px 14px 18px; line-height: 1.6; }
+  .details p span {
+    display:inline-block; margin: 3px 4px; padding: 5px 10px;
+    background: #ffffff10; border: 1px solid rgba(148,163,184,.35);
+    border-radius: 999px; font-size: 13px; cursor: pointer;
+  }
 
-        .btn-2::before {
-            background: linear-gradient(135deg, #00cec9, #0984e3);
-        }
+  /* =============== FILTER MODAL CONTENT =============== */
+  .filter-modal-content {
+    background: var(--card-bg);
+    width: 96%; max-width: 620px;
+    margin: 36px auto; border-radius: 16px; padding: 14px 12px 16px;
+    color: var(--text);
+  }
+  .filter-modal-content h3 { margin: 6px 4px 10px; }
+  .filter-search { margin: 0 4px 10px; }
+  .filter-search input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(148,163,184,.35);
+    border-radius: 10px;
+    background: #ffffff10; color: var(--text);
+  }
 
-        .btn-3::before {
-            background: linear-gradient(135deg, #fd79a8, #e84393);
-        }
+  /* Grid: tighter horizontal spacing for options */
+  .grid-3 {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;                /* reduced from 12/14 -> tighter */
+    padding: 4px;            /* tighter side spacing */
+  }
+  @media (min-width: 600px) { .grid-3 { gap: 10px; } }
+  .grid-3 .opt {
+    text-align:center; cursor:pointer;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 4px;            /* reduced internal padding */
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    background: #ffffff08;
+  }
+  .grid-3 .opt:hover { transform: translateY(-2px); }
+  .grid-3 .opt.selected { border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,.2); }
+  .grid-3 img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; }
+  .grid-3 .name { display:block; font-weight: 700; margin-top: 6px; font-size: 13px; }
+  .grid-3 .count { display:block; font-size: 12px; color: #94a3b8; }
 
-        .btn-4::before {
-            background: linear-gradient(135deg, #fdcb6e, #e17055);
-        }
+  /* Gallery images - single column with equal margins */
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+  .gallery img {
+    width: calc(100% - 10px);
+    margin: 0 5px;
+    border-radius: 8px;
+    height: auto;
+  }
 
-        .footer {
-            margin-top: 50px;
-            color: #636e72;
-            font-size: 0.9rem;
-        }
+  /* PWA Install Prompt */
+  .install-prompt {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    transform: translateY(150%);
+    transition: transform 0.3s ease;
+  }
+  .install-prompt.show {
+    transform: translateY(0);
+  }
+  .install-prompt button {
+    background: var(--grad-primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .install-prompt button:hover {
+    background: var(--grad-primary-hover);
+  }
 
-        /* Animation for buttons */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn {
-            animation: fadeIn 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .btn:nth-child(1) { animation-delay: 0.1s; }
-        .btn:nth-child(2) { animation-delay: 0.2s; }
-        .btn:nth-child(3) { animation-delay: 0.3s; }
-        .btn:nth-child(4) { animation-delay: 0.4s; }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .buttons-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  /* Offline indicator */
+  .offline-indicator {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ef4444;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+  }
+  .offline-indicator.show {
+    display: block;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>All Forms</h1>
-        <p class="subtitle"></p>
-        
-        <div class="buttons-grid">
-            <button class="btn btn-1" onclick="openContent('part1.html')">
-                <i class="fas fa-file-alt"></i>
-                <span>All Part Form</span>
-            </button>
-            
-            <button class="btn btn-2" onclick="openContent('part2.html')">
-                <i class="fas fa-file-invoice"></i>
-                <span>Cone-1 Form</span>
-            </button>
-            
-            <button class="btn btn-3" onclick="openContent('part3.html')">
-                <i class="fas fa-file-contract"></i>
-                <span>Cone-2 Form</span>
-            </button>
-            
-            <button class="btn btn-4" onclick="openContent('part4.html')">
-                <i class="fas fa-file-signature"></i>
-                <span> </span>
-            </button>
-        </div>
-        
-        <div class="footer">
-            <p>© 2023 Premium Content Portal. All rights reserved.</p>
-        </div>
-    </div>
 
-    <script>
-        function openContent(fileName) {
-            window.open(fileName, '_blank');
-        }
-        
-        // Optional: Add animation on hover for better interactivity
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px)';
-            });
-            
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-    </script>
+<!-- Offline Indicator -->
+<div class="offline-indicator" id="offlineIndicator">You are offline</div>
+
+<header>
+  <button class="icon-btn" id="homeBtn" title="Home" aria-label="Home">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M3 9.5l9-7 9 7V20a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2V9.5z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <input type="text" id="searchBar" placeholder="Search videos..." inputmode="search" />
+
+  <div class="header-actions">
+    <button class="icon-btn" id="shuffleBtn" title="Shuffle current list" aria-label="Shuffle">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M4 20l5-5m11-2h-3.5a2.5 2.5 0 0 1-2-4l5-5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme"></div>
+  </div>
+</header>
+
+<!-- Filter buttons with selected text - Only Actress filter remains -->
+<div class="filter-buttons">
+  <button onclick="openFilter('actress')" id="btn-actress" aria-label="Filter Actress">Actress: All</button>
+  <button class="icon-btn" id="randomBtn" title="Show 3 random videos" aria-label="Random 3">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<!-- Install Prompt -->
+<div class="install-prompt" id="installPrompt">
+  <span>Install VideoHub for better experience</span>
+  <button id="installBtn">Install</button>
+  <button id="dismissInstall">Dismiss</button>
+</div>
+
+<!-- Grid + Pagination -->
+<div class="video-grid" id="videoGrid"></div>
+<div class="pagination" id="pagination"></div>
+
+<!-- Video Modal -->
+<div class="modal" id="videoModal" role="dialog" aria-modal="true">
+  <span class="close" onclick="closeModal('videoModal')" aria-label="Close">&times;</span>
+  <div class="modal-content">
+    <iframe id="videoPlayer" class="player" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+    <div id="videoTitle" class="video-title"></div>
+    <div class="details" id="videoDetails"></div>
+    <div class="gallery" id="videoGallery"></div>
+  </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal" id="filterModal" role="dialog" aria-modal="true">
+  <span class="close" onclick="closeModal('filterModal')" aria-label="Close">&times;</span>
+  <div class="filter-modal-content" id="filterContent">
+    <h3 id="filterTitle"></h3>
+    <div class="filter-search"><input type="text" id="filterSearch" placeholder="Search..." /></div>
+    <div id="filterBody"></div>
+  </div>
+</div>
+
+<script>
+// Sample data for demonstration
+const videos = [
+  {
+    title: "Sample Video 1 - This is a longer title that should wrap to two lines",
+    code: "ABC-123",
+    actress: ["Alice"],
+    studio: ["Studio One"],
+    label: ["Label X"],
+    series: ["Series A"],
+    tags: ["Tag1", "Tag2"],
+    description: "This is a sample video description.",
+    thumbnail: "https://placehold.co/320x180/8B5CF6/FFFFFF/png?text=Sample+Video+1",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: [
+      "https://placehold.co/600x400/7C3AED/FFFFFF/png?text=Gallery+1",
+      "https://placehold.co/600x400/6D28D9/FFFFFF/png?text=Gallery+2"
+    ]
+  },
+  {
+    title: "Sample Video 2 - Another long title that should definitely wrap to the second line",
+    code: "DEF-456",
+    actress: ["Betty"],
+    studio: ["Studio Two"],
+    label: ["Label Y"],
+    series: ["Series B"],
+    tags: ["Tag3", "Tag4"],
+    description: "This is another sample video description.",
+    thumbnail: "https://placehold.co/320x180/7C3AED/FFFFFF/png?text=Sample+Video+2",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: [
+      "https://placehold.co/600x400/8B5CF6/FFFFFF/png?text=Gallery+3",
+      "https://placehold.co/600x400/7C3AED/FFFFFF/png?text=Gallery+4"
+    ]
+  },
+  {
+    title: "Video 3",
+    code: "GHI-789",
+    actress: ["Cathy"],
+    studio: ["Studio Three"],
+    label: ["Label Z"],
+    series: ["Series C"],
+    tags: ["Tag5", "Tag6"],
+    description: "Short description.",
+    thumbnail: "https://placehold.co/320x180/6D28D9/FFFFFF/png?text=Sample+Video+3",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: []
+  },
+  {
+    title: "Sample Video 4 - This title is also quite long and should wrap properly to two lines without cutting off",
+    code: "JKL-012",
+    actress: ["Diana"],
+    studio: ["Studio Four"],
+    label: ["Label W"],
+    series: ["Series D"],
+    tags: ["Tag7", "Tag8"],
+    description: "This is a sample video description.",
+    thumbnail: "https://placehold.co/320x180/8B5CF6/FFFFFF/png?text=Sample+Video+4",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: []
+  },
+  {
+    title: "Video 5",
+    code: "MNO-345",
+    actress: ["Eva"],
+    studio: ["Studio Five"],
+    label: ["Label V"],
+    series: ["Series E"],
+    tags: ["Tag9", "Tag10"],
+    description: "Short description.",
+    thumbnail: "https://placehold.co/320x180/7C3AED/FFFFFF/png?text=Sample+Video+5",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: []
+  },
+  {
+    title: "Sample Video 6 - Another very long title that should wrap to two complete lines without being cut off",
+    code: "PQR-678",
+    actress: ["Fiona"],
+    studio: ["Studio Six"],
+    label: ["Label U"],
+    series: ["Series F"],
+    tags: ["Tag11", "Tag12"],
+    description: "This is a sample video description.",
+    thumbnail: "https://placehold.co/320x180/6D28D9/FFFFFF/png?text=Sample+Video+6",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    gallery: []
+  }
+];
+
+// Sample filters data
+const filters = {
+  actress: {
+    "Alice": "https://placehold.co/200x300/8B5CF6/FFFFFF/png?text=Alice",
+    "Betty": "https://placehold.co/200x300/7C3AED/FFFFFF/png?text=Betty",
+    "Cathy": "https://placehold.co/200x300/6D28D9/FFFFFF/png?text=Cathy",
+    "Diana": "https://placehold.co/200x300/8B5CF6/FFFFFF/png?text=Diana",
+    "Eva": "https://placehold.co/200x300/7C3AED/FFFFFF/png?text=Eva",
+    "Fiona": "https://placehold.co/200x300/6D28D9/FFFFFF/png?text=Fiona"
+  },
+  tags: {
+    "Tag1": "https://placehold.co/200x300/8B5CF6/FFFFFF/png?text=Tag1",
+    "Tag2": "https://placehold.co/200x300/7C3AED/FFFFFF/png?text=Tag2",
+    "Tag3": "https://placehold.co/200x300/6D28D9/FFFFFF/png?text=Tag3",
+    "Tag4": "https://placehold.co/200x300/8B5CF6/FFFFFF/png?text=Tag4",
+    "Tag5": "https://placehold.co/200x300/7C3AED/FFFFFF/png?text=Tag5",
+    "Tag6": "https://placehold.co/200x300/6D28D9/FFFFFF/png?text=Tag6"
+  }
+};
+
+/* ================== PWA Functionality ================== */
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(registration => {
+      console.log('SW registered: ', registration);
+    }).catch(registrationError => {
+      console.log('SW registration failed: ', registrationError);
+    });
+  });
+}
+
+// Track online/offline status
+window.addEventListener('online', () => {
+  document.getElementById('offlineIndicator').classList.remove('show');
+});
+
+window.addEventListener('offline', () => {
+  document.getElementById('offlineIndicator').classList.add('show');
+});
+
+// Install prompt handling
+let deferredPrompt;
+const installPrompt = document.getElementById('installPrompt');
+const installBtn = document.getElementById('installBtn');
+const dismissBtn = document.getElementById('dismissInstall');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  // Show the install button
+  installPrompt.classList.add('show');
+  
+  // Check if already installed
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    installPrompt.classList.remove('show');
+  }
+});
+
+installBtn.addEventListener('click', () => {
+  // Hide the app provided install promotion
+  installPrompt.classList.remove('show');
+  // Show the install prompt
+  deferredPrompt.prompt();
+  // Wait for the user to respond to the prompt
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+  });
+});
+
+dismissBtn.addEventListener('click', () => {
+  installPrompt.classList.remove('show');
+});
+
+// Check if app is already installed
+window.addEventListener('appinstalled', (evt) => {
+  console.log('App was installed');
+  installPrompt.classList.remove('show');
+});
+
+/* ================== Helpers ================== */
+function toArray(val){
+  if(!val) return [];
+  if(Array.isArray(val)) return val.map(v=>String(v).trim());
+  return String(val).split(",").map(v=>v.trim()).filter(Boolean);
+}
+function shuffleArray(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+
+/* ================== State ================== */
+const perPage = 12;
+let currentPage = 1;
+let activeFilters = {}; // { type: [value] } or empty array for All
+let filtered = [];
+
+/* ================== Init ================== */
+function init(){
+  filtered = shuffleArray([...videos]);
+  renderVideos();
+}
+document.addEventListener('DOMContentLoaded', init);
+
+/* ================== Apply Filters ================== */
+function applyAllFilters(){
+  filtered = videos.filter(v=>{
+    return Object.entries(activeFilters).every(([key,vals])=>{
+      if(!vals || !vals.length) return true; // All
+      return vals.some(val=>toArray(v[key]).includes(val));
+    });
+  });
+  filtered = shuffleArray(filtered);
+  currentPage = 1;
+  renderVideos();
+}
+
+/* ================== Render Grid + Pagination ================== */
+function renderVideos(){
+  const grid = document.getElementById("videoGrid");
+  grid.innerHTML = "";
+  const start = (currentPage-1)*perPage;
+  const pageItems = filtered.slice(start, start + perPage);
+  pageItems.forEach(v=>{
+    const card = document.createElement("div");
+    card.className = "video-card";
+    card.innerHTML = `
+      <div class="thumbnail-container">
+        <img src="${v.thumbnail}" loading="lazy" alt="${v.title}">
+      </div>
+      <b>${v.title}</b>
+    `;
+    card.onclick = ()=>openVideo(v);
+    grid.appendChild(card);
+  });
+  renderPagination();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ===== Compact pagination: prev 3, current, next 3 ===== */
+function renderPagination(){
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const pag = document.getElementById("pagination");
+  pag.innerHTML = "";
+  if(totalPages <= 1) return;
+
+  const start = Math.max(1, currentPage - 3);
+  const end = Math.min(totalPages, currentPage + 3);
+
+  for(let p = start; p <= end; p++){
+    const btn = document.createElement("button");
+    btn.textContent = p;
+    if(p === currentPage) btn.classList.add("active");
+    btn.onclick = ()=>{ currentPage = p; renderVideos(); };
+    pag.appendChild(btn);
+  }
+}
+
+/* ================== Search ================== */
+document.getElementById("searchBar").addEventListener("input", e=>{
+  const q = e.target.value.toLowerCase();
+  activeFilters = {}; // reset filters when searching
+  updateFilterButtonsUI();
+  filtered = shuffleArray(videos.filter(v=>
+    v.title.toLowerCase().includes(q) ||
+    v.code.toLowerCase().includes(q) ||
+    toArray(v.actress).some(a=>a.toLowerCase().includes(q)) ||
+    toArray(v.studio).some(s=>s.toLowerCase().includes(q)) ||
+    toArray(v.label).some(l=>l.toLowerCase().includes(q)) ||
+    toArray(v.series).some(s=>s.toLowerCase().includes(q)) ||
+    toArray(v.tags).some(t=>t.toLowerCase().includes(q))
+  ));
+  currentPage = 1; renderVideos();
+});
+
+/* ================== Video Modal ================== */
+function openVideo(v){
+  document.getElementById("videoTitle").textContent = v.title;
+  document.getElementById("videoPlayer").src = v.videoUrl;
+
+  const details = `
+    <p><b>Code:</b> <span onclick="setFilter('code','${v.code}')">${v.code}</span></p>
+    <p><b>Actress:</b> ${toArray(v.actress).map(a=>`<span onclick="setFilter('actress','${a}')">${a}</span>`).join(" ")}</p>
+    <p><b>Studio:</b> ${toArray(v.studio).map(s=>`<span onclick="setFilter('studio','${s}')">${s}</span>`).join(" ")}</p>
+    <p><b>Label:</b> ${toArray(v.label).map(l=>`<span onclick="setFilter('label','${l}')">${l}</span>`).join(" ")}</p>
+    <p><b>Series:</b> ${toArray(v.series).map(s=>`<span onclick="setFilter('series','${s}')">${s}</span>`).join(" ")}</p>
+    <p><b>Tags:</b> ${toArray(v.tags).map(t=>`<span onclick="setFilter('tags','${t}')">${t}</span>`).join(" ")}</p>
+    <p>${v.description || ""}</p>`;
+  document.getElementById("videoDetails").innerHTML = details;
+
+  const gallery = document.getElementById("videoGallery");
+  gallery.innerHTML = "";
+  (v.gallery || []).forEach(img=>{
+    const el = document.createElement("img");
+    el.src = img; el.loading = "lazy"; el.alt = "";
+    gallery.appendChild(el);
+  });
+  document.getElementById("videoModal").style.display = "flex";
+}
+function closeModal(id){
+  document.getElementById(id).style.display = "none";
+  if(id === "videoModal") document.getElementById("videoPlayer").src = "";
+}
+
+/* ================== Filter Modal ================== */
+/* Always show ALL options (even 0 videos). If filters.js has master maps, use them; fallback to values from data. */
+function getAllOptionsFor(type){
+  // Prefer master list from filters.js (if present)
+  const map = (type === "tags" ? (filters.tags || null) : (filters[type] || null));
+  let keys = map ? Object.keys(map) : null;
+
+  if(!keys || !keys.length){
+    // Fallback to unique values from dataset
+    keys = [...new Set(videos.flatMap(v=>toArray(v[type])))];
+  }
+  return keys.sort((a,b)=>a.localeCompare(b)); // stable base order
+}
+
+function openFilter(type){
+  const modal = document.getElementById("filterModal");
+  const body = document.getElementById("filterBody");
+  const title = document.getElementById("filterTitle");
+  body.innerHTML = "";
+  title.textContent = "Choose " + type;
+
+  // Selected handling
+  const selected = (activeFilters[type] && activeFilters[type][0]) || "All";
+
+  // Build options
+  const baseOptions = getAllOptionsFor(type);
+  // Shuffle others (excluding selected and All)
+  const others = shuffleArray(baseOptions.filter(it => it !== selected));
+
+  // Ordering: All first, selected next (if not All), then shuffled others
+  const allOptions = ["All", ...(selected !== "All" ? [selected] : []), ...others];
+
+  const container = document.createElement("div");
+  container.className = "grid-3";
+
+  allOptions.forEach(it=>{
+    const map = (type === "tags" ? (filters.tags || null) : (filters[type] || null));
+    const imgLink = (map && map[it]) ? map[it] : "https://via.placeholder.com/200x300.png?text=" + encodeURIComponent(it);
+    const div = document.createElement("div");
+    div.className = "opt" + (it === selected ? " selected" : "");
+    // Count based on current dataset (can be 0 and still shown)
+    const count = it === "All" ? videos.length : videos.filter(v=>toArray(v[type]).includes(it)).length;
+
+    div.innerHTML = `
+      <img src="${imgLink}" loading="lazy" alt="">
+      <span class="name">${it}</span>
+      <span class="count">${count} ${count===1?'video':'videos'}</span>
+    `;
+    div.onclick = ()=>setFilter(type, it);
+    container.appendChild(div);
+  });
+
+  body.appendChild(container);
+
+  // Search within the filter modal
+  const searchInput = document.getElementById("filterSearch");
+  searchInput.value = "";
+  searchInput.oninput = ()=>{
+    const q = searchInput.value.toLowerCase();
+    [...container.children].forEach(child=>{
+      const name = child.querySelector(".name").textContent.toLowerCase();
+      child.style.display = name.includes(q) ? "block" : "none";
+    });
+  };
+
+  modal.style.display = "flex";
+}
+
+function setFilter(type, val){
+  if(val === "All"){ activeFilters[type] = []; }
+  else { activeFilters[type] = [val]; }
+  updateFilterButtonsUI();
+  applyAllFilters();
+  closeModal("filterModal"); closeModal("videoModal");
+}
+
+function updateFilterButtonsUI(){
+  // Only update the actress button since others were removed
+  const btn = document.getElementById("btn-actress");
+  const sel = (activeFilters.actress && activeFilters.actress[0]) || "All";
+  btn.textContent = "Actress: " + sel;
+}
+
+/* ================== Header Buttons ================== */
+document.getElementById("shuffleBtn").addEventListener("click", ()=>{
+  filtered = shuffleArray(filtered.length ? filtered : videos);
+  currentPage = 1;
+  renderVideos();
+});
+
+document.getElementById("randomBtn").addEventListener("click", ()=>{
+  const pool = (Object.keys(activeFilters).length && filtered.length) ? filtered : videos;
+  const pick3 = shuffleArray(pool).slice(0,3);
+  filtered = pick3;
+  currentPage = 1;
+  renderVideos();
+});
+
+document.getElementById("homeBtn").addEventListener("click", ()=>{
+  activeFilters = {};
+  updateFilterButtonsUI();
+  filtered = shuffleArray([...videos]);
+  currentPage = 1;
+  renderVideos();
+});
+
+/* ================== Theme ================== */
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("click", ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+});
+if(localStorage.getItem("theme") === "dark"){ document.body.classList.add("dark"); }
+
+/* ================== Modal Close Helpers ================== */
+function closeOnBackgroundClick(e, id){
+  const modal = document.getElementById(id);
+  if(e.target === modal){ closeModal(id); }
+}
+document.getElementById("videoModal").addEventListener("click", e=>closeOnBackgroundClick(e, "videoModal"));
+document.getElementById("filterModal").addEventListener("click", e=>closeOnBackgroundClick(e, "filterModal"));
+</script>
+
+<script>
+// Inline service worker code
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE_NAME = 'videohub-v1';
+    const urlsToCache = [
+      '/',
+      '/styles.css',
+      '/app.js',
+      'https://placehold.co/320x180/8B5CF6/FFFFFF/png?text=Sample+Video+1',
+      'https://placehold.co/320x180/7C3AED/FFFFFF/png?text=Sample+Video+2'
+    ];
+
+    self.addEventListener('install', event => {
+      event.waitUntil(
+        caches.open(CACHE_NAME)
+          .then(cache => cache.addAll(urlsToCache))
+      );
+    });
+
+    self.addEventListener('fetch', event => {
+      event.respondWith(
+        caches.match(event.request)
+          .then(response => response || fetch(event.request))
+      );
+    });
+  `;
+  
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swURL = URL.createObjectURL(blob);
+  
+  navigator.serviceWorker.register(swURL)
+    .then(registration => console.log('SW registered'))
+    .catch(error => console.log('SW registration failed: ', error));
+}
+</script>
+
+<script type="application/json" id="manifest">
+{
+  "name": "VideoHub",
+  "short_name": "VideoHub",
+  "description": "A video browsing PWA application",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/7C3AED/FFFFFF/png?text=V",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://placehold.co/512x512/7C3AED/FFFFFF/png?text=V",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["entertainment", "video"]
+}
+</script>
+
 </body>
 </html>
